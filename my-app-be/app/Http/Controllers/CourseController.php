@@ -29,25 +29,26 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        $courses = new Course();
-        $courses->course_code = $request->course_code;
-        $courses->course_name = $request->course_name;
-        $courses->course_description = $request->course_description;
-        $courses->course_college = $request->course_college;
+        $existingCourse= Course::where('course_code',$request->course_code)->first();
 
-        // $members = new Member;    //Member is from App\Models\Member.php
-        // $members-> member_lastname = $request-> member_lastname;
-        // $members-> member_firstname = $request-> member_firstname;
-        // $members-> member_address = $request-> member_address;
-      
-        
-		$courses->save();
+        if ($existingCourse){
+            return response()->json(['message'=>'Course already exists'],409);
+        }
 
-		$message= (object)[
-			"status"=>"1",
-			"message" => "You Successfully Added " . $request->course_name . "!"
-		];
-		return response()->json($message);
+        else{
+            $courses = new Course();
+            $courses->course_code = $request->course_code;
+            $courses->course_name = $request->course_name;
+            $courses->course_description = $request->course_description;
+            $courses->course_college = $request->course_college;
+            $courses->save();
+    
+            $message= (object)[
+                "status"=>"1",
+                "message" => "You Successfully Added " . $request->course_name . "!"
+            ];
+            return response()->json($message);
+        }
     }
 
     /**
